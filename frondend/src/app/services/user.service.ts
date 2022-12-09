@@ -8,15 +8,15 @@ import { IUserLogin } from '../shared/interfaces/IUserLogin';
 import { ToastrService } from 'ngx-toastr';
 import { JsonPipe } from '@angular/common';
 
-const USER_KEY='user'
+const USER_KEY='currentuser';
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-     private userSubject = new BehaviorSubject<User> (this.getLocalStorage());//(new User());
+     private userSubject = new BehaviorSubject<User>(this.getLocalStorage());//(new User());
      public userObervable:Observable<User>;
   constructor(private http:HttpClient,private toastrService:ToastrService) { 
-    this.userObervable =this.userSubject.asObservable();
+    this.userObervable = this.userSubject.asObservable();
   }
 
   login (userLogin: IUserLogin):Observable<User>  {
@@ -24,6 +24,9 @@ export class UserService {
       tap({
         next:(user)=>{
             this.setLocalStorage(user);
+            //Important line to redirect from login
+            //Happy scenario getting the new user from server needs to be updated
+            this.userSubject.next(user);
             this.toastrService.success(`Welcome to FoodLover ${user.name}!`,
             'Login Successful')
         },
@@ -46,4 +49,5 @@ private getLocalStorage():User{
     if (userJson) return JSON.parse(userJson) as User;
     return new User();
 }
+
 }

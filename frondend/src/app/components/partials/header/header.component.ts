@@ -16,13 +16,15 @@ private sub: any =null;
     this.sub = cartService.getCartObservable().subscribe((newCart) =>{
       this.cartQuantity = newCart.totalCount;
     })
-    this.sub = userService.userObervable.subscribe((newUser) => {
+      this.sub = userService.userObervable.subscribe((newUser) => {
       this.user = newUser;
     })
    }
 
   ngOnInit(): void {
+
   }
+
   logout(){
     this.userService.logout();
   }

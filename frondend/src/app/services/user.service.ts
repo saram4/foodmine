@@ -2,9 +2,10 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, Observable, observable, tap } from 'rxjs';
-import { USER_LOGIN_URL } from '../shared/constants/urls';
+import { USER_LOGIN_URL, USER_REGISTER_URL } from '../shared/constants/urls';
 import { User } from '../shared/models/User';
 import { IUserLogin } from '../shared/interfaces/IUserLogin';
+import {IUserRegister} from '../shared/interfaces/IUserRegister';
 import { ToastrService } from 'ngx-toastr';
 import { JsonPipe } from '@angular/common';
 
@@ -31,10 +32,34 @@ export class UserService {
             'Login Successful')
         },
         error:(errorResonse) =>{
+          if (errorResonse.status == 0 )
+          {
+            this.toastrService.error('Technical Failure. Please try after sometime!!')
+          }
+          else{
             this.toastrService.error(errorResonse.error, 'Login Failed!')
+          }
+
         }
       })
     );
+  }
+
+  register(userRegister:IUserRegister):Observable<User>{
+    return this.http.post<User>(USER_REGISTER_URL,userRegister).pipe(
+      tap({
+          next: (user) => {
+            this.setLocalStorage(user);
+            this.userSubject.next(user);
+            this.toastrService.success(`Welcome foodLover ${user.name}!`,'Register Successfully!')
+          },
+          error: (errorResponse) =>{
+            this.toastrService.error(errorResponse.error,'Registration Failed!')
+          }
+        
+          
+      }
+    ))
   }
   logout(){
     this.userSubject.next(new User());
